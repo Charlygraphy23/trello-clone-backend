@@ -12,6 +12,15 @@ export type GenerateJwtTokenType = {
   expires: string;
 };
 
+type UpdateUserProfileType = {
+  firstName: string,
+  lastName: string,
+  profileImage: string,
+  userId: string
+}
+
+
+
 export const getHTMLForSignupEmail = (link: string) => {
   return `
     <h1>Sign up Email</h1>
@@ -107,4 +116,8 @@ export const refetchToken = async (token: string) => {
   const newAccessToken = generateJwtToken(tokenData)
 
   return { accessToken: newAccessToken, _id, email }
+}
+
+export const updateUserProfile = async ({ firstName, lastName, profileImage, userId }: UpdateUserProfileType) => {
+  return UserModel.findByIdAndUpdate({ _id: convertObjectId(userId) }, { firstName, lastName, profileImage })
 }

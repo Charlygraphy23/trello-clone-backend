@@ -2,7 +2,7 @@ import express from 'express';
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 import { MEMBER_ROLES, SuccessResponse } from '../../config';
-import { addLabelWithBoardId, createBoard, createBoardMember, findBoardById, findLabelByIdAndUpdate, getBoardDetails } from '../../helper';
+import { addLabelWithBoardId, createBoard, createBoardMember, findBoardAndUpdate, findBoardById, findLabelByIdAndUpdate, getBoardDetails } from '../../helper';
 
 export const createBoardController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
 
@@ -119,6 +119,29 @@ export const updateLabelController = async (req: express.Request, res: express.R
         await findLabelByIdAndUpdate({
             backgroundColor, name, userId: user._id.toString(), labelId
         }).catch(err => { throw { status: 500, message: err.message, error: err } });
+
+        return SuccessResponse.send({ res, message: "Ok" })
+
+    }
+    catch (err) {
+        console.error(err)
+        next(err)
+    }
+
+}
+
+export const updateBoardBackgroundController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+
+    try {
+
+
+
+        const { boardId, backgroundColor } = req.body;
+
+        if (!boardId || !backgroundColor) throw { status: 422, message: "Invalid Input" }
+
+        const data = { backgroundColor }
+        await findBoardAndUpdate(boardId, data).catch(err => { throw { status: 500, message: err.message, error: err } });
 
         return SuccessResponse.send({ res, message: "Ok" })
 

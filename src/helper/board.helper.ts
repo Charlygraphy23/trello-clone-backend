@@ -223,6 +223,48 @@ const getBoardDetailsQuery = (boardId: string): PipelineStage[] => {
                     },
 
 
+                    {
+                        $lookup: {
+                            from: 'task_members',
+                            let: { taskId: "$taskId" },
+                            pipeline: [
+
+                                {
+                                    $match: {
+                                        $expr: { $eq: ['$taskId', "$$taskId"] }
+                                    }
+                                },
+
+                                {
+                                    $lookup: {
+                                        from: 'users',
+                                        let: { userId: "$userId" },
+                                        pipeline: [
+
+                                            {
+                                                $match: {
+                                                    $expr: { $eq: ['$_id', "$$userId"] }
+                                                }
+                                            },
+
+                                            { $project: { _id: 1, firstName: 1, lastName: 1, profileImage: 1 } },
+
+                                        ],
+                                        as: "user"
+                                    }
+                                },
+
+                                { $unwind: "$user" },
+
+                                { $replaceRoot: { newRoot: "$user" } },
+
+                                { $project: { __v: 0, updatedAt: 0 } },
+
+                            ],
+                            as: "members"
+                        }
+                    },
+
 
                     { $project: { __v: 0, updatedAt: 0 } },
 
@@ -335,11 +377,15 @@ export const findBoardById = async (boardId: string) => {
     return BoardModel.findById({ _id: convertObjectId(boardId) })
         .catch(err => { throw err })
 }
+export const findBoardAndUpdate = async (boardId: string, data: any) => {
+    return BoardModel.findByIdAndUpdate({ _id: convertObjectId(boardId) }, { ...data })
+        .catch(err => { throw err })
+}
 
 export const findLabelByIdAndUpdate = async ({
     labelId, backgroundColor, name
 }: AddLabelType) => {
-    return BoardModel.findOneAndUpdate({
+    return LabelModel.findOneAndUpdate({
         labelId
     }, { backgroundColor, name })
         .catch(err => { throw err })

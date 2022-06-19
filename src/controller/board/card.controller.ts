@@ -2,7 +2,7 @@ import express from 'express';
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 import { CARD_TYPE, SuccessResponse } from '../../config';
-import { addCheckList, addCheckListGroup, addList, addTask, checkListFindById, checkListFindByIdAndDelete, checkListGroupFindById, deleteCheckListGroup, findTaskById, getBoardInfoWithMemberId, labelFindById, taskFindById, taskUpdateById, updateCheckList, updateListPosition, updateTaskPosition, verifyBoardWithListId } from '../../helper';
+import { addCheckList, addCheckListGroup, addCommentToTask, addList, addMemberFormTask, addTask, checkListFindById, checkListFindByIdAndDelete, checkListGroupFindById, deleteCheckListGroup, deleteComment, findTaskById, getAllMessagesOfTask, getBoardInfoWithMemberId, getMemberListOfTask, labelFindById, removeMemberFormTask, taskFindById, taskUpdateById, updateCheckList, updateListPosition, updateTaskPosition, verifyBoardWithListId } from '../../helper';
 
 
 export const addListController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -335,11 +335,122 @@ export const deleteCheckListGroupController = async (req: express.Request, res: 
 
     }
     catch (err) {
-
-
-        await session.abortTransaction()
         session.endSession()
 
+        console.error(err)
+        next(err)
+    }
+
+
+}
+
+export const toggleMembersInTask = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+
+    try {
+        const { taskId, remove } = req.body;
+        // @ts-expect-error
+        const user = req.user
+        const userId = user._id.toString()
+
+        if (!taskId) throw { status: 422, message: "Please provide taskId" }
+
+
+        const [taskFound, memberList] = await Promise.all([
+            taskFindById(taskId),
+            getMemberListOfTask(taskId),
+        ])
+
+
+        if (!taskFound) throw { status: 422, message: "Task not found" }
+
+        if (memberList.find(member => member?.userId?.toString() === userId) && remove) {
+            await removeMemberFormTask({ userId, taskId })
+        }
+        else if (!remove) {
+            await addMemberFormTask({ userId, taskId })
+        }
+
+        return SuccessResponse.send({ status: 200, message: "Ok", res })
+
+    }
+    catch (err) {
+        console.error(err)
+        next(err)
+    }
+
+
+}
+
+
+export const addTaskCommentController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+
+    try {
+        const { taskId, message, commentId } = req.body;
+        // @ts-expect-error
+        const user = req.user
+        const userId = user._id.toString()
+
+        if (!taskId) throw { status: 422, message: "Please provide taskId" }
+        if (!message) throw { status: 422, message: "Please provide message" }
+        if (!commentId) throw { status: 422, message: "Please provide commentId" }
+
+
+        const taskFound = await taskFindById(taskId)
+
+
+        if (!taskFound) throw { status: 422, message: "Task not found" }
+
+        await addCommentToTask({ userId, taskId: taskFound.taskId, message, commentId })
+
+        return SuccessResponse.send({ status: 200, message: "Ok", res })
+
+    }
+    catch (err) {
+        console.error(err)
+        next(err)
+    }
+
+
+}
+
+export const getAllCommentsOfTaskController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    try {
+        const { taskId } = req.params;
+
+
+        if (!taskId) throw { status: 422, message: "Please provide taskId" }
+
+        const taskFound = await taskFindById(taskId)
+
+
+        if (!taskFound) throw { status: 422, message: "Task not found" }
+
+        const data = await getAllMessagesOfTask(taskFound.taskId)
+
+        return SuccessResponse.send({ status: 200, message: "Ok", res, data })
+
+    }
+    catch (err) {
+        console.error(err)
+        next(err)
+    }
+
+
+}
+
+export const deleteCommentController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    try {
+        const { commentId } = req.params;
+
+
+        if (!commentId) throw { status: 422, message: "Please provide commentId" }
+
+        await deleteComment(commentId)
+
+        return SuccessResponse.send({ status: 200, message: "Ok", res })
+
+    }
+    catch (err) {
         console.error(err)
         next(err)
     }

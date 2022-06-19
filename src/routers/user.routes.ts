@@ -3,17 +3,23 @@ import {
   addCheckListGroupController,
   addLabelController,
   addListController,
+  addTaskCommentController,
   addTaskController,
   addTaskInfoController,
-  checkUserAuth, createBoardController, createWorkSpaceController, deleteCheckListController, deleteCheckListGroupController, GenerateLinkWithEmailController,
+  checkUserAuth, createBoardController, createWorkSpaceController, deleteCheckListController, deleteCheckListGroupController, deleteCommentController, GenerateLinkWithEmailController,
+  getAllCommentsOfTaskController,
   getBoardDataController,
+  getCloudinarySignature,
   getUserProfileController,
   GoogleSignupController,
   homeController,
   signInViaEmailController,
   signOutController,
   SignUpWithEmailController,
+  toggleMembersInTask,
+  updateBoardBackgroundController,
   updateCheckListController,
+  updateProfile,
   updateTaskAndColumnsPositionController,
   updateTaskLabelController
 } from '../controller';
@@ -31,7 +37,8 @@ import {
   updateCheckListControllerValidator,
   updateLabelValidator,
   updateTaskAndColumnsPositionValidator,
-  updateTaskLabelValidator
+  updateTaskLabelValidator,
+  updateUserValidator
 } from '../validator';
 
 
@@ -131,5 +138,12 @@ router.put('/update-checklist', updateCheckListControllerValidator, updateCheckL
 router.post('/add-checklist-group', addCheckListGroupValidator, addCheckListGroupController)
 router.delete('/delete-checkList/:checkListId', deleteCheckListController)
 router.delete('/delete-checkList-group/:checkListGroupId', deleteCheckListGroupController)
+router.post('/toggle-members-task', toggleMembersInTask)
+router.post('/add-comment-task', addTaskCommentController)
+router.get('/all-comments-task/:taskId', getAllCommentsOfTaskController)
+router.delete('/delete-comment/:commentId', deleteCommentController)
+router.put('/change-background', updateBoardBackgroundController)
+router.put('/update-profile', updateUserValidator, updateProfile)
+router.post('/get-signature', getCloudinarySignature)
 
 export default router;

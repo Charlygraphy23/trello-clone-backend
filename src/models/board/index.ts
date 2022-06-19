@@ -5,4 +5,5 @@ export * from './labels.model'
 export * from './list.model'
 export * from './members.model'
 export * from './task.model'
+export * from './taskMembers.model'
 

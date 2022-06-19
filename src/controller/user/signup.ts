@@ -1,7 +1,7 @@
 import express = require('express');
 import { Result, ValidationError, validationResult } from 'express-validator';
+import { sendEmail } from '../../config';
 import { COOKIE_OPTIONS, LoginType, SuccessResponse, TOKEN_EXP } from '../../config/app.config';
-import { sendEmail } from '../../config/emai.config';
 import {
   checkEmail,
   checkUserWithGoogleId,

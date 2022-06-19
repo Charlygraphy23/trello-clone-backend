@@ -23,3 +23,8 @@ export const signInViaEmailValidator = [
   body('email', 'Email is not valid').isEmail(),
   body('password', 'Password Required!').not().isEmpty(),
 ]
+
+export const updateUserValidator = [
+  body('firstName', 'firstName Required!').not().isEmpty(),
+  body('lastName', 'lastName Required!').not().isEmpty(),
+]

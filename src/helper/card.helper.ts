@@ -1,6 +1,7 @@
 import mongoose, { PipelineStage } from "mongoose";
 import { convertObjectId } from "../config";
-import { BoardModel, CheckListGroupModel, CheckListModel, LabelModel, ListModel, TaskModel } from "../models";
+import { BoardModel, CheckListGroupModel, CheckListModel, LabelModel, ListModel, TaskMemberModel, TaskModel } from "../models";
+import { TaskCommentsModel } from "../models/board/taskComment.model";
 
 type AddListType = {
     title: string,
@@ -51,6 +52,13 @@ type AddCheckListGroupType = {
     checkListGroupId: string,
     userId: string,
     title: string
+}
+
+type AddTaskModelCommentType = {
+    userId: string,
+    message: string,
+    taskId: string,
+    commentId: string,
 }
 
 const getBoardQuery = ({ boardId, userId }: { boardId: string, userId: string }): PipelineStage[] => {
@@ -345,4 +353,61 @@ export const deleteCheckListGroup = async ({ checkListGroupId, session }: { chec
         CheckListModel.deleteMany({ checkListGroupId }, { session })
     ]).catch(err => { throw err })
 
+}
+
+export const getMemberListOfTask = async (taskId: string) => {
+    return await TaskMemberModel.find({ taskId })
+        .catch(err => { throw err })
+}
+
+export const removeMemberFormTask = async ({ userId, taskId }: { userId: string, taskId: string }) => {
+    return await TaskMemberModel.findOneAndDelete({ taskId, userId })
+        .catch(err => { throw err })
+}
+
+export const addMemberFormTask = async ({ userId, taskId }: { userId: string, taskId: string }) => {
+    return await TaskMemberModel.create({ taskId, userId })
+        .catch(err => { throw err })
+}
+
+
+export const addCommentToTask = async ({ userId, taskId, message, commentId }: AddTaskModelCommentType) => {
+    return TaskCommentsModel.create({
+        userId,
+        taskId, message, commentId
+    })
+        .catch(err => { throw err })
+}
+
+export const getAllMessagesOfTask = async (taskId: string) => {
+    return TaskCommentsModel.aggregate([
+
+        {
+            $match: { $expr: { $eq: ["$taskId", taskId] } }
+        },
+
+        {
+            $lookup: {
+                from: 'users',
+                let: { userId: "$userId" },
+                pipeline: [
+                    { $match: { $expr: { $eq: ["$_id", '$$userId'] } } },
+
+                    { $project: { __v: 0, updatedAt: 0 } }
+                ],
+                as: 'user'
+            }
+        },
+
+        { $unwind: "$user" },
+        { $project: { __v: 0, updatedAt: 0 } }
+
+
+    ])
+        .catch(err => { throw err })
+}
+
+export const deleteComment = async (comment: string) => {
+    return TaskCommentsModel.findOneAndDelete({ commentId: comment })
+        .catch(err => { throw err })
 }
