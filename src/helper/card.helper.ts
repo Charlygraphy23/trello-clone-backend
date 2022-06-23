@@ -411,3 +411,7 @@ export const deleteComment = async (comment: string) => {
     return TaskCommentsModel.findOneAndDelete({ commentId: comment })
         .catch(err => { throw err })
 }
+
+export const getAllTask = () => {
+    return TaskModel.find()
+}

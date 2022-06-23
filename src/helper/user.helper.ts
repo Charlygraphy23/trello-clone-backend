@@ -3,13 +3,14 @@ import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import { convertObjectId, TOKEN_EXP } from '../config';
 import { UserModel } from '../models';
+import { InviteModel } from '../models/user/invite.model';
 
 const saltRounds = 10;
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export type GenerateJwtTokenType = {
   data: any;
-  expires: string;
+  expires?: string;
 };
 
 type UpdateUserProfileType = {
@@ -43,7 +44,11 @@ export const findUserById = async (id: string = '') => {
 };
 
 export const generateJwtToken = ({ data, expires }: GenerateJwtTokenType) => {
-  return jwt.sign(data, process.env.JWT_KEY, { expiresIn: expires });
+
+
+  const options = expires ? { expiresIn: expires } : {}
+
+  return jwt.sign(data, process.env.JWT_KEY, options);
 };
 
 export const generateSignUpEmail = (email: string = '') => {
@@ -120,4 +125,22 @@ export const refetchToken = async (token: string) => {
 
 export const updateUserProfile = async ({ firstName, lastName, profileImage, userId }: UpdateUserProfileType) => {
   return UserModel.findByIdAndUpdate({ _id: convertObjectId(userId) }, { firstName, lastName, profileImage })
+}
+
+export const checkInviteEmail = async (email: string) => {
+  return InviteModel.findOne({ email })
+}
+
+export const createNewInvitation = async ({ email, boardId }: { email: string, boardId: string }) => {
+  return InviteModel.create({ email, boardId: convertObjectId(boardId) })
+}
+
+export const generateInvitationLink = ({ id }: { id: string }) => {
+  const tokenData = {
+    id,
+  };
+  const token = generateJwtToken({ data: tokenData });
+
+  const link = process.env.FRONT_END_URL + '/invite?token=' + token;
+  return link
 }

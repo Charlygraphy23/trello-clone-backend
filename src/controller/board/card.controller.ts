@@ -3,6 +3,7 @@ import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 import { CARD_TYPE, SuccessResponse } from '../../config';
 import { addCheckList, addCheckListGroup, addCommentToTask, addList, addMemberFormTask, addTask, checkListFindById, checkListFindByIdAndDelete, checkListGroupFindById, deleteCheckListGroup, deleteComment, findTaskById, getAllMessagesOfTask, getBoardInfoWithMemberId, getMemberListOfTask, labelFindById, removeMemberFormTask, taskFindById, taskUpdateById, updateCheckList, updateListPosition, updateTaskPosition, verifyBoardWithListId } from '../../helper';
+import { LabelModel, TaskModel } from '../../models';
 
 
 export const addListController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -455,5 +456,39 @@ export const deleteCommentController = async (req: express.Request, res: express
         next(err)
     }
 
+
+}
+
+
+export const deleteLabelController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+
+    const session = await mongoose.startSession();
+    session.startTransaction()
+
+
+    try {
+
+        const { labelId } = req.body;
+
+        if (!labelId) throw { status: 422, message: "Invalid Input" }
+
+        await LabelModel.findOneAndDelete({ labelId }, { session }).catch(err => { throw err })
+
+        await TaskModel.updateMany({}, { $pull: { labels: { $in: [labelId] } } }, { session }).catch(err => { throw err })
+
+
+        await session.commitTransaction();
+        session.endSession()
+        return SuccessResponse.send({ res, message: "Ok" })
+
+    }
+    catch (err) {
+
+        await session.abortTransaction();
+        session.endSession()
+
+        console.error(err)
+        next(err)
+    }
 
 }

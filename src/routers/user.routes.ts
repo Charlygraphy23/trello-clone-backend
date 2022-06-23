@@ -6,19 +6,21 @@ import {
   addTaskCommentController,
   addTaskController,
   addTaskInfoController,
-  checkUserAuth, createBoardController, createWorkSpaceController, deleteCheckListController, deleteCheckListGroupController, deleteCommentController, GenerateLinkWithEmailController,
+  checkUserAuth, createBoardController, createWorkSpaceController, deleteCheckListController, deleteCheckListGroupController, deleteCommentController, deleteLabelController, GenerateLinkWithEmailController,
   getAllCommentsOfTaskController,
   getBoardDataController,
   getCloudinarySignature,
   getUserProfileController,
   GoogleSignupController,
   homeController,
+  inviteFriends,
   signInViaEmailController,
   signOutController,
   SignUpWithEmailController,
   toggleMembersInTask,
   updateBoardBackgroundController,
   updateCheckListController,
+  updateLabelController,
   updateProfile,
   updateTaskAndColumnsPositionController,
   updateTaskLabelController
@@ -32,6 +34,7 @@ import {
   createBoardValidator,
   createWorkSpaceValidator, GenerateLinkWithEmailValidator,
   GoogleSignupValidator,
+  inviteValidator,
   signInViaEmailValidator,
   SignUpWithEmailValidator,
   updateCheckListControllerValidator,
@@ -131,7 +134,8 @@ router.put(
 router.put('/add-task-info', addTaskInfoController)
 
 router.post('/add-labels', addLabelValidator, addLabelController)
-router.put('/update-labels', updateLabelValidator, addLabelController)
+router.put('/update-labels', updateLabelValidator, updateLabelController)
+router.post('/delete-labels', deleteLabelController)
 
 router.put('/update-task-labels', updateTaskLabelValidator, updateTaskLabelController)
 router.put('/update-checklist', updateCheckListControllerValidator, updateCheckListController)
@@ -145,5 +149,7 @@ router.delete('/delete-comment/:commentId', deleteCommentController)
 router.put('/change-background', updateBoardBackgroundController)
 router.put('/update-profile', updateUserValidator, updateProfile)
 router.post('/get-signature', getCloudinarySignature)
+router.post('/invite', inviteValidator, inviteFriends)
+
 
 export default router;

@@ -265,8 +265,35 @@ const getBoardDetailsQuery = (boardId: string): PipelineStage[] => {
                         }
                     },
 
+                    {
+                        $lookup: {
+                            from: 'task_comments',
+                            let: { taskId: "$taskId" },
+                            pipeline: [
 
-                    { $project: { __v: 0, updatedAt: 0 } },
+                                { $match: { $expr: { $eq: ['$taskId', "$$taskId"] } } },
+
+                            ],
+                            as: "checkListGroups"
+                        }
+                    },
+
+                    {
+                        $addFields: {
+                            taskCommentCount: {
+                                $reduce: {
+                                    input: "$checkListGroups",
+                                    initialValue: 0,
+                                    in: {
+                                        $add: ['$$value', 1]
+                                    }
+                                }
+                            }
+                        }
+                    },
+
+
+                    { $project: { __v: 0, updatedAt: 0, checkListGroups: 0 } },
 
                 ],
                 as: "tasks"

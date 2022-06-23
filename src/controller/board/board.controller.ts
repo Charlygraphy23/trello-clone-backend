@@ -83,6 +83,8 @@ export const addLabelController = async (req: express.Request, res: express.Resp
         // @ts-expect-error
         const user = req.user
 
+        if (!boardId) throw { status: 400, message: " Invalid board ID" }
+
 
         const isValidBoard = await findBoardById(boardId).catch(err => { throw { status: 500, message: err.message, error: err } });
 
