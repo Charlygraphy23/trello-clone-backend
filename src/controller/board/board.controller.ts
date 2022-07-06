@@ -25,7 +25,7 @@ export const createBoardController = async (req: express.Request, res: express.R
         const [boardData] = await createBoard({ session, workspace, name, backgroundColor, createdBy: user._id })
 
         // @ts-expect-error
-        await createBoardMember({ session, userId: user._id, role: MEMBER_ROLES.ADMIN, boardId: boardData?._id })
+        await createBoardMember({ session, userId: user._id, role: MEMBER_ROLES.ADMIN, boardId: boardData?._id, workspace: boardData.workspace })
 
         await session.commitTransaction()
         session.endSession()

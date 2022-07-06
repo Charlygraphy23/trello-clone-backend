@@ -1,9 +1,10 @@
 import express = require('express');
 import { v2 } from 'cloudinary';
 import { validationResult } from 'express-validator';
-import { sendEmail, SuccessResponse } from '../../config';
+import mongoose from 'mongoose';
+import { MEMBER_ROLES, sendEmail, SuccessResponse } from '../../config';
 import '../../config/cloudinary.config';
-import { checkInviteEmail, createNewInvitation, findBoardById, generateInvitationLink, updateUserProfile } from '../../helper';
+import { checkInviteEmail, createBoardMember, createNewInvitation, findBoardById, generateInvitationLink, getInviteById, jwtVerify, updateInvitation, updateUserProfile } from '../../helper';
 
 export const getUserProfileController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
 
@@ -81,13 +82,13 @@ export const inviteFriends = async (req: express.Request, res: express.Response,
         const { email, boardId } = req.body;
 
         const [isEmailAlreadyExists, isBoardExist] = await Promise.all([
-            checkInviteEmail(email),
+            checkInviteEmail(email, boardId),
             findBoardById(boardId)
         ]).catch(err => { throw err })
 
 
         if (!isBoardExist) throw { status: 422, message: "Board not found!!" }
-        if (isEmailAlreadyExists) throw { status: 422, message: 'Invitation Already send' + isEmailAlreadyExists.accepted ? 'and accepted!!' : '' }
+        if (isEmailAlreadyExists) throw { status: 422, message: `Invitation Already send ${isEmailAlreadyExists.accepted ? 'and accepted!!' : ''}` }
 
         const invitationData = await createNewInvitation({ email, boardId }).catch(err => { throw err })
 
@@ -122,6 +123,100 @@ export const inviteFriends = async (req: express.Request, res: express.Response,
         });
 
         return SuccessResponse.send({ status: 200, message: "Ok", res })
+
+    }
+    catch (err) {
+        console.error(err)
+        next(err)
+    }
+
+}
+
+export const acceptInvitationController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+
+    const session = await mongoose.startSession();
+    session.startTransaction()
+
+
+    try {
+
+        const error = validationResult(req)
+
+        if (!error.isEmpty()) throw { status: 422, message: "Validation Error", error }
+
+        const { token } = req.body;
+        // @ts-expect-error
+        const user = req.user
+
+        const decoded: any = jwtVerify(token)
+
+        if (!decoded) throw { status: 422, message: "Invalid token" }
+
+        const inviteId = decoded?.id;
+
+        if (!inviteId) throw { status: 422, message: "Invalid inviteId!!" }
+
+        const inviteDetails = await getInviteById(inviteId).catch(err => { throw err })
+
+
+        if (!inviteDetails) throw { status: 422, message: "Invalid Invitation!!" }
+        if (inviteDetails.email !== user.email) throw { status: 422, message: `Invitation email not matched!!` }
+        if (inviteDetails.accepted) throw { status: 422, message: `Invitation already accepted` }
+
+        if (!inviteDetails?.boardId) throw { status: 500, message: "Board Id Invalid!!" }
+
+        const boardDetails = await findBoardById(inviteDetails?.boardId?.toString()).catch(err => { throw err })
+
+        if (!boardDetails?._id || !boardDetails?.workspace) throw { status: 500, message: "Board Details Invalid!!" }
+
+        await createBoardMember({ session, userId: user._id, role: MEMBER_ROLES.MEMBER, boardId: boardDetails?._id.toString(), workspace: boardDetails.workspace?.toString() })
+
+        await updateInvitation({
+            id: inviteId, data: {
+                accepted: true
+            },
+            session
+        }).catch(err => { throw err })
+
+        await session.commitTransaction()
+        session.endSession()
+
+        return SuccessResponse.send({ status: 200, message: "Ok", res })
+
+    }
+    catch (err) {
+
+        await session.abortTransaction()
+        session.endSession()
+
+        console.error(err)
+        next(err)
+    }
+
+}
+
+export const getInviteInfoController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+
+
+    try {
+
+        const error = validationResult(req)
+
+        if (!error.isEmpty()) throw { status: 422, message: "Validation Error", error }
+
+        const { token } = req.body;
+
+        if (!token) throw { status: 422, message: "Please provide token!!" }
+
+        const decoded: any = jwtVerify(token)
+
+        if (!decoded) throw { status: 422, message: "Invalid token" }
+
+        const inviteId = decoded?.id;
+
+        const data = await getInviteById(inviteId).catch(err => { throw err })
+
+        return SuccessResponse.send({ status: 200, message: "Ok", res, data })
 
     }
     catch (err) {

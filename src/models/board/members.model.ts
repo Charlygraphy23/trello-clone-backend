@@ -5,7 +5,8 @@ export interface MemberModelType {
     _id?: mongoose.Schema.Types.ObjectId;
     memberId?: mongoose.Schema.Types.ObjectId,
     role?: MEMBER_ROLES,
-    boardId?: mongoose.Schema.Types.ObjectId
+    boardId?: mongoose.Schema.Types.ObjectId,
+    workspace?: mongoose.Schema.Types.ObjectId
 }
 
 const schema = new mongoose.Schema<MemberModelType>(
@@ -25,16 +26,21 @@ const schema = new mongoose.Schema<MemberModelType>(
 
         boardId: {
             type: mongoose.Schema.Types.ObjectId,
-            index: true,
             default: '',
             ref: 'boards'
+        },
+
+        workspace: {
+            type: mongoose.Schema.Types.ObjectId,
+            default: '',
+            ref: 'workspaces'
         }
 
     },
     { timestamps: true }
 );
 
-schema.index({ createdBy: 1, workspace: 1 })
+schema.index({ workspace: 1, boardId: 1 })
 
 
 export const MemberModel = mongoose.model('members', schema);

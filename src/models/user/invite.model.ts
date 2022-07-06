@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-export interface UserModelType {
+export interface InviteModelType {
     _id?: mongoose.Types.ObjectId,
     email?: string;
     accepted?: boolean,
@@ -8,7 +8,7 @@ export interface UserModelType {
 
 }
 
-const schema = new mongoose.Schema<UserModelType>(
+const schema = new mongoose.Schema<InviteModelType>(
     {
 
         email: {
@@ -16,7 +16,6 @@ const schema = new mongoose.Schema<UserModelType>(
             default: '',
             lowercase: true,
             trim: true,
-            unique: true,
         },
 
         accepted: {

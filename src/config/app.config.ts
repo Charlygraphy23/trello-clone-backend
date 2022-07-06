@@ -116,7 +116,7 @@ export const connectToDB = async () => {
     .catch((err) => console.error(err));
 };
 
-export const convertObjectId = (id: string) => {
+export const convertObjectId = (id: string): mongoose.Types.ObjectId => {
   return new mongoose.Types.ObjectId(id)
 }
 
@@ -126,7 +126,8 @@ export const COOKIE_OPTIONS = {
 }
 
 export enum MEMBER_ROLES {
-  ADMIN = 'ADMIN'
+  ADMIN = 'ADMIN',
+  MEMBER = "MEMBER"
 }
 
 export enum CARD_TYPE {

@@ -1,5 +1,6 @@
 import express from 'express';
 import {
+  acceptInvitationController,
   addCheckListGroupController,
   addLabelController,
   addListController,
@@ -10,6 +11,7 @@ import {
   getAllCommentsOfTaskController,
   getBoardDataController,
   getCloudinarySignature,
+  getInviteInfoController,
   getUserProfileController,
   GoogleSignupController,
   homeController,
@@ -27,6 +29,7 @@ import {
 } from '../controller';
 import { UserMiddleware } from '../middleware';
 import {
+  acceptInvitationValidator,
   addCheckListGroupValidator,
   addLabelValidator,
   addListValidator,
@@ -149,7 +152,9 @@ router.delete('/delete-comment/:commentId', deleteCommentController)
 router.put('/change-background', updateBoardBackgroundController)
 router.put('/update-profile', updateUserValidator, updateProfile)
 router.post('/get-signature', getCloudinarySignature)
+router.post('/invite-info', getInviteInfoController)
 router.post('/invite', inviteValidator, inviteFriends)
+router.patch('/accept-invite', acceptInvitationValidator, acceptInvitationController)
 
 
 export default router;

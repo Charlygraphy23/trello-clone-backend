@@ -34,3 +34,7 @@ export const inviteValidator = [
   body('email', 'Email is not valid').isEmail(),
   body('boardId', 'boardId is not valid').isMongoId(),
 ]
+
+export const acceptInvitationValidator = [
+  body('token', 'inviteId Required!').not().isEmpty()
+]

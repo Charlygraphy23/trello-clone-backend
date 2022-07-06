@@ -1,9 +1,10 @@
 import bcrypt from 'bcrypt';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
 import { convertObjectId, TOKEN_EXP } from '../config';
 import { UserModel } from '../models';
-import { InviteModel } from '../models/user/invite.model';
+import { InviteModel, InviteModelType } from '../models/user/invite.model';
 
 const saltRounds = 10;
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -127,12 +128,20 @@ export const updateUserProfile = async ({ firstName, lastName, profileImage, use
   return UserModel.findByIdAndUpdate({ _id: convertObjectId(userId) }, { firstName, lastName, profileImage })
 }
 
-export const checkInviteEmail = async (email: string) => {
-  return InviteModel.findOne({ email })
+export const checkInviteEmail = async (email: string, boardId: string) => {
+  return InviteModel.findOne({ email, boardId: convertObjectId(boardId) })
+}
+
+export const getInviteById = async (id: string) => {
+  return InviteModel.findById({ _id: convertObjectId(id) })
 }
 
 export const createNewInvitation = async ({ email, boardId }: { email: string, boardId: string }) => {
   return InviteModel.create({ email, boardId: convertObjectId(boardId) })
+}
+
+export const updateInvitation = async ({ session, id, data }: { session: mongoose.ClientSession, id: string, data: InviteModelType }) => {
+  return InviteModel.findByIdAndUpdate({ _id: convertObjectId(id) }, { ...data }, { session })
 }
 
 export const generateInvitationLink = ({ id }: { id: string }) => {

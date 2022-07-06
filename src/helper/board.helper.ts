@@ -12,7 +12,8 @@ type CreateBoardMemberType = {
     session: mongoose.ClientSession,
     userId: string,
     role: MEMBER_ROLES,
-    boardId: string
+    boardId: string,
+    workspace: string
 }
 
 type AddLabelType = {
@@ -37,12 +38,13 @@ export const createBoard = async ({ name, backgroundColor, workspace, createdBy,
 
 }
 
-export const createBoardMember = async ({ session, userId, role, boardId }: CreateBoardMemberType) => {
+export const createBoardMember = async ({ session, userId, role, boardId, workspace }: CreateBoardMemberType) => {
 
     return await MemberModel.create([{
         memberId: convertObjectId(userId),
         role: role,
-        boardId: convertObjectId(boardId)
+        boardId: convertObjectId(boardId),
+        workspace: convertObjectId(workspace)
     }], { session })
         .catch(err => {
             throw { status: 500, message: err.message, error: err }
