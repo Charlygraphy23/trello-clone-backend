@@ -415,3 +415,29 @@ export const deleteComment = async (comment: string) => {
 export const getAllTask = () => {
     return TaskModel.find()
 }
+
+export const deleteTaskById = async ({ session, taskId, listId }: { session: mongoose.ClientSession, taskId: string, listId: string }) => {
+    const allTasks = await TaskModel.find({ listId })
+        .catch(err => { throw err })
+
+
+    const filterTaskById = allTasks.filter(task => task.taskId !== taskId)
+
+    const sortedTasks = filterTaskById.sort((a, b) => {
+        if (a.order > b.order) return 1;
+        else return -1
+    })
+
+    // delete existing task
+    await TaskModel.findOneAndDelete({ taskId }, { session })
+
+    let order = 0;
+
+    for (let task of sortedTasks) {
+        if (taskId !== task.taskId) {
+            await TaskModel.findByIdAndUpdate({ _id: task._id }, {
+                order: order++,
+            }, { session }).catch(err => { throw err })
+        }
+    }
+}

@@ -38,3 +38,8 @@ export const inviteValidator = [
 export const acceptInvitationValidator = [
   body('token', 'inviteId Required!').not().isEmpty()
 ]
+
+export const deleteTaskByIdValidator = [
+  body('taskId', 'inviteId Required!').isUUID(),
+  body('listId', 'inviteId Required!').isUUID(),
+]

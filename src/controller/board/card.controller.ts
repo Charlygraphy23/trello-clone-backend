@@ -2,7 +2,7 @@ import express from 'express';
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
 import { CARD_TYPE, SuccessResponse } from '../../config';
-import { addCheckList, addCheckListGroup, addCommentToTask, addList, addMemberFormTask, addTask, checkListFindById, checkListFindByIdAndDelete, checkListGroupFindById, deleteCheckListGroup, deleteComment, findTaskById, getAllMessagesOfTask, getBoardInfoWithMemberId, getMemberListOfTask, labelFindById, removeMemberFormTask, taskFindById, taskUpdateById, updateCheckList, updateListPosition, updateTaskPosition, verifyBoardWithListId } from '../../helper';
+import { addCheckList, addCheckListGroup, addCommentToTask, addList, addMemberFormTask, addTask, checkListFindById, checkListFindByIdAndDelete, checkListGroupFindById, deleteCheckListGroup, deleteComment, deleteTaskById, findTaskById, getAllMessagesOfTask, getBoardInfoWithMemberId, getMemberListOfTask, labelFindById, removeMemberFormTask, taskFindById, taskUpdateById, updateCheckList, updateListPosition, updateTaskPosition, verifyBoardWithListId } from '../../helper';
 import { LabelModel, TaskModel } from '../../models';
 
 
@@ -348,12 +348,10 @@ export const deleteCheckListGroupController = async (req: express.Request, res: 
 export const toggleMembersInTask = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
 
     try {
-        const { taskId, remove } = req.body;
-        // @ts-expect-error
-        const user = req.user
-        const userId = user._id.toString()
+        const { taskId, remove, userId } = req.body;
 
         if (!taskId) throw { status: 422, message: "Please provide taskId" }
+        if (!userId) throw { status: 422, message: "Please provide userId" }
 
 
         const [taskFound, memberList] = await Promise.all([
@@ -489,6 +487,48 @@ export const deleteLabelController = async (req: express.Request, res: express.R
 
         console.error(err)
         next(err)
+    }
+
+}
+
+export const deleteTaskByIdController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+
+
+    const session = await mongoose.startSession();
+
+
+    try {
+
+        await session.withTransaction(async () => {
+
+            const error = validationResult(req)
+
+            if (!error.isEmpty()) throw { status: 422, message: "Validation Error", error }
+
+
+            const { taskId, listId } = req.body;
+
+
+            await deleteTaskById({ session, listId, taskId });
+
+            await session.commitTransaction();
+            return SuccessResponse.send({ res, message: "Ok" })
+
+        })
+            .catch(err => { throw err })
+
+
+
+
+    }
+    catch (err) {
+
+        console.error(err)
+        next(err)
+    }
+    finally {
+        session.endSession()
+
     }
 
 }

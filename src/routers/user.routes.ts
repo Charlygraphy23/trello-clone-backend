@@ -7,7 +7,7 @@ import {
   addTaskCommentController,
   addTaskController,
   addTaskInfoController,
-  checkUserAuth, createBoardController, createWorkSpaceController, deleteCheckListController, deleteCheckListGroupController, deleteCommentController, deleteLabelController, GenerateLinkWithEmailController,
+  checkUserAuth, createBoardController, createWorkSpaceController, deleteCheckListController, deleteCheckListGroupController, deleteCommentController, deleteLabelController, deleteTaskByIdController, GenerateLinkWithEmailController,
   getAllCommentsOfTaskController,
   getBoardDataController,
   getCloudinarySignature,
@@ -35,7 +35,7 @@ import {
   addListValidator,
   addTaskValidator,
   createBoardValidator,
-  createWorkSpaceValidator, GenerateLinkWithEmailValidator,
+  createWorkSpaceValidator, deleteTaskByIdValidator, GenerateLinkWithEmailValidator,
   GoogleSignupValidator,
   inviteValidator,
   signInViaEmailValidator,
@@ -155,6 +155,7 @@ router.post('/get-signature', getCloudinarySignature)
 router.post('/invite-info', getInviteInfoController)
 router.post('/invite', inviteValidator, inviteFriends)
 router.patch('/accept-invite', acceptInvitationValidator, acceptInvitationController)
+router.post('/delete-task-by-id', deleteTaskByIdValidator, deleteTaskByIdController)
 
 
 export default router;
