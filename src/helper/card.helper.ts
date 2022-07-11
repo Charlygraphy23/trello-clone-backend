@@ -416,6 +416,16 @@ export const getAllTask = () => {
     return TaskModel.find()
 }
 
+export const deleteTaskDependencies = async ({ taskId, session }: { taskId: string, session: mongoose.ClientSession }) => {
+    return Promise.all([
+        CheckListModel.deleteMany({ taskId }, { session }),
+        CheckListGroupModel.deleteMany({ taskId }, { session }),
+        TaskCommentsModel.deleteMany({ taskId }, { session }),
+        TaskCommentsModel.deleteMany({ taskId }, { session }),
+        TaskMemberModel.deleteMany({ taskId }, { session }),
+    ]).catch(err => { throw err })
+}
+
 export const deleteTaskById = async ({ session, taskId, listId }: { session: mongoose.ClientSession, taskId: string, listId: string }) => {
     const allTasks = await TaskModel.find({ listId })
         .catch(err => { throw err })
@@ -430,6 +440,7 @@ export const deleteTaskById = async ({ session, taskId, listId }: { session: mon
 
     // delete existing task
     await TaskModel.findOneAndDelete({ taskId }, { session })
+    await deleteTaskDependencies({ session, taskId })
 
     let order = 0;
 
@@ -440,4 +451,16 @@ export const deleteTaskById = async ({ session, taskId, listId }: { session: mon
             }, { session }).catch(err => { throw err })
         }
     }
+}
+export const deleteColumnById = async ({ session, boardId, listId }: { session: mongoose.ClientSession, boardId: string, listId: string }) => {
+
+    await ListModel.findOneAndDelete({ listId, boardId }, { session });
+
+    const tasks = await TaskModel.find({ listId })
+
+    await TaskModel.deleteMany({ listId }, { session, })
+    for (const task of tasks) {
+        await deleteTaskDependencies({ session, taskId: task.taskId }).catch(err => { throw err })
+    }
+
 }

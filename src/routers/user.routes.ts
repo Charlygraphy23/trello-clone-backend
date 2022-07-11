@@ -7,7 +7,7 @@ import {
   addTaskCommentController,
   addTaskController,
   addTaskInfoController,
-  checkUserAuth, createBoardController, createWorkSpaceController, deleteCheckListController, deleteCheckListGroupController, deleteCommentController, deleteLabelController, deleteTaskByIdController, GenerateLinkWithEmailController,
+  checkUserAuth, createBoardController, createWorkSpaceController, deleteCheckListController, deleteCheckListGroupController, deleteColumnController, deleteCommentController, deleteLabelController, deleteTaskByIdController, GenerateLinkWithEmailController,
   getAllCommentsOfTaskController,
   getBoardDataController,
   getCloudinarySignature,
@@ -35,7 +35,7 @@ import {
   addListValidator,
   addTaskValidator,
   createBoardValidator,
-  createWorkSpaceValidator, deleteTaskByIdValidator, GenerateLinkWithEmailValidator,
+  createWorkSpaceValidator, deleteColumnValidator, deleteTaskByIdValidator, GenerateLinkWithEmailValidator,
   GoogleSignupValidator,
   inviteValidator,
   signInViaEmailValidator,
@@ -148,7 +148,7 @@ router.delete('/delete-checkList-group/:checkListGroupId', deleteCheckListGroupC
 router.post('/toggle-members-task', toggleMembersInTask)
 router.post('/add-comment-task', addTaskCommentController)
 router.get('/all-comments-task/:taskId', getAllCommentsOfTaskController)
-router.delete('/delete-comment/:commentId', deleteCommentController)
+router.post('/delete-comment', deleteCommentController)
 router.put('/change-background', updateBoardBackgroundController)
 router.put('/update-profile', updateUserValidator, updateProfile)
 router.post('/get-signature', getCloudinarySignature)
@@ -156,6 +156,7 @@ router.post('/invite-info', getInviteInfoController)
 router.post('/invite', inviteValidator, inviteFriends)
 router.patch('/accept-invite', acceptInvitationValidator, acceptInvitationController)
 router.post('/delete-task-by-id', deleteTaskByIdValidator, deleteTaskByIdController)
+router.post('/delete-list', deleteColumnValidator, deleteColumnController)
 
 
 export default router;

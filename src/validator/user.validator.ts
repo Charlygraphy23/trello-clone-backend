@@ -42,4 +42,10 @@ export const acceptInvitationValidator = [
 export const deleteTaskByIdValidator = [
   body('taskId', 'inviteId Required!').isUUID(),
   body('listId', 'inviteId Required!').isUUID(),
+  body('boardId', 'inviteId Required!').isMongoId(),
+]
+
+export const deleteColumnValidator = [
+  body('boardId', 'inviteId Required!').isMongoId(),
+  body('listId', 'inviteId Required!').isUUID(),
 ]

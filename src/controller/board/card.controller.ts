@@ -1,8 +1,8 @@
 import express from 'express';
 import { validationResult } from 'express-validator';
 import mongoose from 'mongoose';
-import { CARD_TYPE, SuccessResponse } from '../../config';
-import { addCheckList, addCheckListGroup, addCommentToTask, addList, addMemberFormTask, addTask, checkListFindById, checkListFindByIdAndDelete, checkListGroupFindById, deleteCheckListGroup, deleteComment, deleteTaskById, findTaskById, getAllMessagesOfTask, getBoardInfoWithMemberId, getMemberListOfTask, labelFindById, removeMemberFormTask, taskFindById, taskUpdateById, updateCheckList, updateListPosition, updateTaskPosition, verifyBoardWithListId } from '../../helper';
+import { CARD_TYPE, getSocket, SuccessResponse } from '../../config';
+import { addCheckList, addCheckListGroup, addCommentToTask, addList, addMemberFormTask, addTask, checkListFindById, checkListFindByIdAndDelete, checkListGroupFindById, deleteCheckListGroup, deleteColumnById, deleteComment, deleteTaskById, findTaskById, getAllMessagesOfTask, getBoardInfoWithMemberId, getMemberListOfTask, labelFindById, removeMemberFormTask, taskFindById, taskUpdateById, updateCheckList, updateListPosition, updateTaskPosition, verifyBoardWithListId } from '../../helper';
 import { LabelModel, TaskModel } from '../../models';
 
 
@@ -12,6 +12,7 @@ export const addListController = async (req: express.Request, res: express.Respo
 
     try {
         const error = validationResult(req)
+        const { io } = getSocket()
 
         if (!error.isEmpty()) throw { status: 422, message: "Validation Error", error }
 
@@ -28,11 +29,10 @@ export const addListController = async (req: express.Request, res: express.Respo
 
 
         // Create list
-
-        await addList({ title, listId, boardId, userId: user.id.toString() })
+        const listData = await addList({ title, listId, boardId, userId: user.id.toString() })
             .catch(err => { throw err })
 
-
+        io?.to(boardId).emit("add-list", { listData, userId: user._id.toString() })
 
         return SuccessResponse.send({ status: 200, message: "Ok", res })
 
@@ -52,6 +52,7 @@ export const addTaskController = async (req: express.Request, res: express.Respo
 
     try {
         const error = validationResult(req)
+        const { io } = getSocket()
 
         if (!error.isEmpty()) throw { status: 422, message: "Validation Error", error }
 
@@ -69,9 +70,11 @@ export const addTaskController = async (req: express.Request, res: express.Respo
 
         // Create Task
 
-        await addTask({ content, listId, boardId, userId: user.id.toString(), taskId })
+        const taskData = await addTask({ content, listId, boardId, userId: user.id.toString(), taskId })
             .catch(err => { throw err })
 
+
+        io?.to(boardId).emit("add-task", { taskData, userId: user._id.toString() })
         return SuccessResponse.send({ status: 200, message: "Ok", res })
 
 
@@ -89,6 +92,7 @@ export const updateTaskAndColumnsPositionController = async (req: express.Reques
 
 
     const session = await mongoose.startSession();
+    const { io } = getSocket()
 
 
     try {
@@ -101,6 +105,8 @@ export const updateTaskAndColumnsPositionController = async (req: express.Reques
 
 
             const { type, source, destination, draggableId, boardId, listId } = req.body;
+            // @ts-expect-error
+            const user = req.user
 
 
             if (type === CARD_TYPE.TASK) {
@@ -115,7 +121,13 @@ export const updateTaskAndColumnsPositionController = async (req: express.Reques
 
             }
 
+            const body = {
+                ...req.body,
+                userId: user._id.toString(),
+            }
+
             await session.commitTransaction();
+            io?.to(boardId).emit("update-card-position", body)
             return SuccessResponse.send({ res, message: "Ok" })
 
         })
@@ -144,12 +156,16 @@ export const addTaskInfoController = async (req: express.Request, res: express.R
     try {
 
         const error = validationResult(req)
+        const { io } = getSocket()
 
         if (!error.isEmpty()) throw { status: 422, message: "Validation Error", error }
 
-        const { taskId, data } = req.body;
+        const { taskId, data, boardId } = req.body;
+        // @ts-expect-error
+        const user = req.user
 
         if (!taskId) throw { status: 422, message: "Please provide TaskId" }
+        if (!boardId) throw { status: 422, message: "Please provide BoardId" }
 
 
         const isValidTask = await taskFindById(taskId);
@@ -159,7 +175,7 @@ export const addTaskInfoController = async (req: express.Request, res: express.R
 
         await taskUpdateById({ taskId, data })
 
-
+        io?.to(boardId).emit("update-task-info", { data, userId: user._id.toString() })
         return SuccessResponse.send({ status: 200, message: "Ok", res })
 
     }
@@ -264,7 +280,8 @@ export const addCheckListGroupController = async (req: express.Request, res: exp
 
         if (!error.isEmpty()) throw { status: 422, message: "Validation Error", error }
 
-        const { taskId, title, checkListGroupId } = req.body;
+        const { taskId, title, checkListGroupId, boardId } = req.body;
+        const { io } = getSocket()
         // @ts-expect-error
         const user = req.user
 
@@ -275,7 +292,7 @@ export const addCheckListGroupController = async (req: express.Request, res: exp
 
         await addCheckListGroup({ taskId, title, checkListGroupId, userId: user._id.toString() })
 
-
+        io?.to(boardId).emit("add-checklist-group", { boardId, taskId, userId: user._id.toString(), title, checkListGroupId })
         return SuccessResponse.send({ status: 200, message: "Ok", res })
 
     }
@@ -384,7 +401,8 @@ export const toggleMembersInTask = async (req: express.Request, res: express.Res
 export const addTaskCommentController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
 
     try {
-        const { taskId, message, commentId } = req.body;
+        const { taskId, message, commentId, boardId } = req.body;
+        const { io } = getSocket()
         // @ts-expect-error
         const user = req.user
         const userId = user._id.toString()
@@ -392,6 +410,7 @@ export const addTaskCommentController = async (req: express.Request, res: expres
         if (!taskId) throw { status: 422, message: "Please provide taskId" }
         if (!message) throw { status: 422, message: "Please provide message" }
         if (!commentId) throw { status: 422, message: "Please provide commentId" }
+        if (!boardId) throw { status: 422, message: "Please provide boardId" }
 
 
         const taskFound = await taskFindById(taskId)
@@ -401,6 +420,17 @@ export const addTaskCommentController = async (req: express.Request, res: expres
 
         await addCommentToTask({ userId, taskId: taskFound.taskId, message, commentId })
 
+        const eventData = {
+            taskId,
+            message,
+            commentId,
+            userId,
+            firstName: user?.firstName,
+            lastName: user?.lastName,
+            profileImage: user?.profileImage,
+            boardId
+        }
+        io?.to(boardId).emit("add-comment", eventData)
         return SuccessResponse.send({ status: 200, message: "Ok", res })
 
     }
@@ -439,13 +469,18 @@ export const getAllCommentsOfTaskController = async (req: express.Request, res: 
 
 export const deleteCommentController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     try {
-        const { commentId } = req.params;
+        const { commentId, boardId, taskId } = req.body;
+        const { io } = getSocket()
+        // @ts-expect-error
+        const user = req.user
 
 
         if (!commentId) throw { status: 422, message: "Please provide commentId" }
+        if (!boardId) throw { status: 422, message: "Please provide boardId" }
+        if (!taskId) throw { status: 422, message: "Please provide taskId" }
 
         await deleteComment(commentId)
-
+        io?.to(boardId).emit("delete-comment", { commentId, boardId, taskId, userId: user._id.toString() })
         return SuccessResponse.send({ status: 200, message: "Ok", res })
 
     }
@@ -496,6 +531,46 @@ export const deleteTaskByIdController = async (req: express.Request, res: expres
 
     const session = await mongoose.startSession();
 
+    try {
+        const { io } = getSocket()
+
+        await session.withTransaction(async () => {
+
+            const error = validationResult(req)
+
+            if (!error.isEmpty()) throw { status: 422, message: "Validation Error", error }
+
+            const { taskId, listId, boardId } = req.body;
+            // @ts-expect-error
+            const user = req.user
+
+            await deleteTaskById({ session, listId, taskId });
+
+            await session.commitTransaction();
+            io?.to(boardId).emit("delete-task", { taskId, listId, boardId, userId: user._id.toString() })
+            return SuccessResponse.send({ res, message: "Ok" })
+
+        })
+            .catch(err => { throw err })
+    }
+    catch (err) {
+
+        console.error(err)
+        next(err)
+    }
+    finally {
+        session.endSession()
+
+    }
+
+}
+
+
+export const deleteColumnController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+
+
+    const session = await mongoose.startSession();
+    const { io } = getSocket()
 
     try {
 
@@ -506,12 +581,14 @@ export const deleteTaskByIdController = async (req: express.Request, res: expres
             if (!error.isEmpty()) throw { status: 422, message: "Validation Error", error }
 
 
-            const { taskId, listId } = req.body;
+            const { boardId, listId } = req.body;
+            // @ts-expect-error
+            const user = req.user
 
-
-            await deleteTaskById({ session, listId, taskId });
+            await deleteColumnById({ session, listId, boardId });
 
             await session.commitTransaction();
+            io?.to(boardId).emit("delete-list", { listId, boardId, userId: user._id.toString() })
             return SuccessResponse.send({ res, message: "Ok" })
 
         })

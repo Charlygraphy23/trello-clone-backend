@@ -22,7 +22,8 @@
     "google-auth-library": "^8.0.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^6.3.0",
-    "sib-api-v3-typescript": "^2.2.2"
+    "sib-api-v3-typescript": "^2.2.2",
+    "socket.io": "^4.5.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
