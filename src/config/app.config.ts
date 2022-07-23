@@ -14,6 +14,7 @@ declare global {
       SENDER_EMAIL: string;
       APP_NAME: string;
       GOOGLE_CLIENT_ID: string
+      HOST: number
     }
   }
 }
@@ -121,8 +122,10 @@ export const convertObjectId = (id: string): mongoose.Types.ObjectId => {
 }
 
 
-export const COOKIE_OPTIONS = {
-  httpOnly: true
+export const COOKIE_OPTIONS: express.CookieOptions = {
+  httpOnly: true,
+  // sameSite: "none",
+  // secure: true
 }
 
 export enum MEMBER_ROLES {

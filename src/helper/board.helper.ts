@@ -276,7 +276,7 @@ const getBoardDetailsQuery = (boardId: string): PipelineStage[] => {
                                 { $match: { $expr: { $eq: ['$taskId', "$$taskId"] } } },
 
                             ],
-                            as: "checkListGroups"
+                            as: "taskComments"
                         }
                     },
 
@@ -284,7 +284,7 @@ const getBoardDetailsQuery = (boardId: string): PipelineStage[] => {
                         $addFields: {
                             taskCommentCount: {
                                 $reduce: {
-                                    input: "$checkListGroups",
+                                    input: "$taskComments",
                                     initialValue: 0,
                                     in: {
                                         $add: ['$$value', 1]
@@ -295,7 +295,7 @@ const getBoardDetailsQuery = (boardId: string): PipelineStage[] => {
                     },
 
 
-                    { $project: { __v: 0, updatedAt: 0, checkListGroups: 0 } },
+                    { $project: { __v: 0, updatedAt: 0, taskComments: 0 } },
 
                 ],
                 as: "tasks"

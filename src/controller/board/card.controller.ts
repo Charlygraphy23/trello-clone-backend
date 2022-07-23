@@ -175,7 +175,7 @@ export const addTaskInfoController = async (req: express.Request, res: express.R
 
         await taskUpdateById({ taskId, data })
 
-        io?.to(boardId).emit("update-task-info", { data, userId: user._id.toString() })
+        io?.to(boardId).emit("update-task-info", { data, userId: user._id.toString(), taskId })
         return SuccessResponse.send({ status: 200, message: "Ok", res })
 
     }
@@ -238,7 +238,8 @@ export const updateCheckListController = async (req: express.Request, res: expre
 
         if (!error.isEmpty()) throw { status: 422, message: "Validation Error", error }
 
-        const { taskId, title, checkListId, isDone, checkListGroupId } = req.body;
+        const { taskId, title, checkListId, isDone, checkListGroupId, boardId } = req.body;
+        const { io } = getSocket()
         // @ts-expect-error
         const user = req.user
 
@@ -251,12 +252,16 @@ export const updateCheckListController = async (req: express.Request, res: expre
         if (!isValidCheckListGroup) throw { status: 422, message: "Checklist group id not valid!!" }
 
         if (!isValidTask) throw { status: 422, message: "Task id not valid!!" }
+        if (!boardId) throw { status: 422, message: "boardId not valid!!" }
 
         if (hasCheckList) {
             await updateCheckList({ title, taskId, checkListId, userId: user._id.toString(), isDone, checkListGroupId })
+            io?.to(boardId).emit("update-checklist", { title, taskId, checkListId, userId: user._id.toString(), isDone, checkListGroupId, boardId })
         }
         else {
+
             await addCheckList({ title, taskId, checkListId, userId: user._id.toString(), isDone, checkListGroupId })
+            io?.to(boardId).emit("add-checklist", { title, taskId, checkListId, userId: user._id.toString(), isDone, checkListGroupId, boardId })
         }
 
 
@@ -308,12 +313,20 @@ export const deleteCheckListController = async (req: express.Request, res: expre
 
     try {
 
-        const { checkListId } = req.params;
+        const { checkListId, boardId, taskId, checkListGroupId } = req.body;
+        const { io } = getSocket()
+        // @ts-expect-error
+        const user = req?.user
 
         if (!checkListId) throw { status: 400, message: "Please provide checkListId" }
+        if (!boardId) throw { status: 400, message: "Please provide boardId" }
+        if (!taskId) throw { status: 400, message: "Please provide taskId" }
+        if (!checkListGroupId) throw { status: 400, message: "Please provide checkListGroupId" }
 
 
         await checkListFindByIdAndDelete(checkListId)
+
+        io?.to(boardId).emit("delete-checklist", { boardId, checkListId, userId: user._id.toString(), taskId, checkListGroupId })
 
         return SuccessResponse.send({ status: 200, message: "Ok", res })
 
@@ -336,9 +349,14 @@ export const deleteCheckListGroupController = async (req: express.Request, res: 
         await session.withTransaction(async () => {
 
 
-            const { checkListGroupId } = req.params;
+            const { checkListGroupId, boardId, taskId } = req.body;
+            const { io } = getSocket()
+            // @ts-expect-error
+            const user = req?.user
 
             if (!checkListGroupId) throw { status: 400, message: "Please provide checkListGroupId" }
+            if (!boardId) throw { status: 400, message: "Please provide boardId" }
+            if (!taskId) throw { status: 400, message: "Please provide taskId" }
 
 
             await deleteCheckListGroup({ checkListGroupId, session })
@@ -346,6 +364,7 @@ export const deleteCheckListGroupController = async (req: express.Request, res: 
             await session.commitTransaction();
             session.endSession()
 
+            io?.to(boardId).emit("delete-checklist-group", { boardId, checkListGroupId, userId: user._id.toString(), taskId })
             return SuccessResponse.send({ status: 200, message: "Ok", res })
 
 
