@@ -16,7 +16,6 @@ export default async (req: express.Request,
 
         const isGoogleToken = accessToken.length > 500;
 
-
         if (isGoogleToken) {
 
             console.log("Proceeding with google token")

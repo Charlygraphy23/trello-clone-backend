@@ -7,8 +7,7 @@ import { UserModel } from '../models';
 import { InviteModel, InviteModelType } from '../models/user/invite.model';
 
 const saltRounds = 10;
-const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
-
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_SECRET, "postmessage");
 export type GenerateJwtTokenType = {
   data: any;
   expires?: string;
@@ -91,6 +90,11 @@ export const googleAuthInfo = async (token: string) => {
 
 
   return payload
+
+}
+
+export const getGoogleToken = async (code: string) => {
+  return await googleClient.getToken(code)
 
 }
 

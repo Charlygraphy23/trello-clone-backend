@@ -31,4 +31,4 @@ connectToDB();
 // error handler
 app.use(errorHandler);
 
-server.listen(3300, process.env.HOST, () => console.log('Listening'));
+server.listen(3300, () => console.log('Listening'));

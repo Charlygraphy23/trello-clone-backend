@@ -10,6 +10,7 @@ import {
   generateJwtToken,
   generatePasswordHash,
   generateSignUpEmail,
+  getGoogleToken,
   getHTMLForSignupEmail,
   googleAuthInfo,
   jwtVerify,
@@ -114,9 +115,12 @@ export const GoogleSignupController = async (req: express.Request,
       throw { status: 400, message: 'Validation Error', error };
     }
 
-    const { token } = req.body
+    const { token: code } = req.body
 
-    const googleInfo = await googleAuthInfo(token);
+
+    const { tokens } = await getGoogleToken(code)
+
+    const googleInfo = await googleAuthInfo(tokens.id_token as string);
 
     if (!googleInfo) throw { status: 400, message: 'No user Found' }
 
@@ -139,7 +143,7 @@ export const GoogleSignupController = async (req: express.Request,
       });
     }
 
-    return SuccessResponse.sendWithCookie({ res, message: 'OK', data: { accessToken: token, auth: true } });
+    return SuccessResponse.sendWithCookie({ res, message: 'OK', data: { accessToken: tokens.id_token, auth: true, refreshToken: tokens.refresh_token } });
   }
 
   catch (err) {
