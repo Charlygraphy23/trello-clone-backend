@@ -5,6 +5,7 @@ import mongoose from 'mongoose';
 import { convertObjectId, TOKEN_EXP } from '../config';
 import { UserModel } from '../models';
 import { InviteModel, InviteModelType } from '../models/user/invite.model';
+import { OtpModel } from '../models/user/otp';
 
 const saltRounds = 10;
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_SECRET, "postmessage");
@@ -156,4 +157,24 @@ export const generateInvitationLink = ({ id }: { id: string }) => {
 
   const link = process.env.FRONT_END_URL + '/invite?token=' + token;
   return link
+}
+
+export const createOtp = async (email: string) => {
+
+
+  const otp = Math.floor(100000 + Math.random() * 900000);
+
+  const currTime = new Date();
+
+  const expires = new Date().setMinutes(currTime.getMinutes() + 3)
+
+  await OtpModel.findOneAndUpdate({ email }, { email, otp, expires }, { upsert: true }).catch(err => { throw err; });
+
+  return otp
+
+}
+
+export const getOtpDetails = async ({ email, otp }: { email: string, otp: string }) => {
+  return await OtpModel.findOne({ email, otp: +otp }).catch(err => { throw err; });
+
 }

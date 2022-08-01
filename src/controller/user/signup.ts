@@ -6,12 +6,14 @@ import {
   checkEmail,
   checkUserWithGoogleId,
   comparePassword,
+  createOtp,
   findUserById,
   generateJwtToken,
   generatePasswordHash,
   generateSignUpEmail,
   getGoogleToken,
   getHTMLForSignupEmail,
+  getOtpDetails,
   googleAuthInfo,
   jwtVerify,
   refetchToken,
@@ -295,6 +297,122 @@ export const signOutController = async (req: express.Request, res: express.Respo
     res.cookie("refresh_token", "", COOKIE_OPTIONS)
 
     return SuccessResponse.send({ res, message: 'Ok', data: { auth: false, accessToken: "", refreshToken: "" } });
+
+  }
+  catch (err) {
+    console.error(err)
+    next(err)
+
+  }
+
+}
+
+
+export const otpGenerateController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+
+  try {
+    const { email } = req.body;
+
+    if (!email) throw { status: 400, message: "Invalid email" }
+
+
+    const emailParams = {
+      subject: 'Forgot Password Otp',
+      body: "",
+      sender: {
+        name: process.env.APP_NAME,
+        email: process.env.SENDER_EMAIL.toLowerCase(),
+      },
+      to: {
+        email: email.toLowerCase(),
+        name: email.toLowerCase(),
+      },
+    };
+
+
+    const checkUserExist = await UserModel.findOne({ email, loginType: LoginType.password })
+
+    if (!checkUserExist) throw { status: 400, message: "Invalid email" }
+
+    const otp = await createOtp(email)
+
+    emailParams.body = `
+      <h1>Otp to reset password</h1>
+  
+      <p>OTP : ${otp}</p>
+    
+    `;
+
+
+    await sendEmail(emailParams).catch((err) => {
+      throw { status: 500, message: err.message, error: err };
+    });
+
+    return SuccessResponse.send({ res, message: 'Ok', data: checkUserExist });
+
+  }
+  catch (err) {
+    console.error(err)
+    next(err)
+
+  }
+
+}
+
+export const verifyOtpController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) throw { status: 400, message: "Invalid email or otp" }
+
+
+    const [checkUserExist, isOtpFound] = await Promise.all([
+      UserModel.findOne({ email, loginType: LoginType.password }),
+      getOtpDetails({ email, otp })
+    ])
+
+    if (!checkUserExist) throw { status: 400, message: "Invalid Email" }
+    if (!isOtpFound) throw { status: 400, message: "Invalid Otp" }
+
+    if (!isOtpFound?.expires || +isOtpFound?.expires < new Date().getTime()) throw { status: 400, message: "Invalid OTP" }
+
+    return SuccessResponse.send({ res, message: 'Ok' });
+
+  }
+  catch (err) {
+    console.error(err)
+    next(err)
+
+  }
+
+}
+
+
+export const resetPasswordController = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) throw { status: 400, message: "Invalid email or password" }
+
+
+    const [checkUserExist] = await Promise.all([
+      UserModel.findOne({ email, loginType: LoginType.password })
+    ])
+
+    if (!checkUserExist) throw { status: 400, message: "Invalid Email" }
+
+    const hashPassword = await generatePasswordHash(password);
+
+    await UserModel.findOneAndUpdate(
+      { email },
+      { password: hashPassword }
+    ).catch((err) => {
+      throw { status: 500, message: err.message, error: err };
+    });
+
+    return SuccessResponse.send({ res, message: 'Ok' });
 
   }
   catch (err) {
