@@ -15,7 +15,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [12.x, 14.x, 16.x]
+        node-version: [ 16.x]
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
@@ -27,7 +27,7 @@ jobs:
         projectName: trello-clone-backend
         envVariableKeys: FRONT_END_URL,JWT_KEY,MONGO_URL,SENDINBLUE_API_KEY,SENDER_EMAIL,GOOGLE_CLIENT_ID,GOOGLE_SECRET,CLOUDINARY_CLOUD_NAME,CLOUDINARY_API_KEY,CLOUDINARY_API_SECRET,CLOUDINARY_DEFAULT_FOLDER,CLOUDINARY_PRESET,APP_NAME
       env:
-          FRONT_END_URL: http://localhost:3000
+          TARGET_FRONT_END_URL: http://localhost:3000
           JWT_KEY: ${{ secrets.JWT_KEY }}
           MONGO_URL: ${{ secrets.MONGO_URL }}
           SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
