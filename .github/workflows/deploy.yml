@@ -29,6 +29,7 @@ jobs:
       env:
           FRONT_END_URL: http://localhost:3000
           TARGET_FRONT_END_URL: production
+          TYPE_FRONT_END_URL: plain
           JWT_KEY: ${{ secrets.JWT_KEY }}
           MONGO_URL: ${{ secrets.MONGO_URL }}
           SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
