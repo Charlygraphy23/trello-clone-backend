@@ -5,7 +5,7 @@ name: Node.js CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ main ]
  
 
 jobs:
@@ -20,11 +20,31 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Use Node.js ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+    - name: Set Env Vars on Vercel Project
+      uses: dkershner6/vercel-set-env-action@v1
       with:
-        node-version: ${{ matrix.node-version }}
-        cache: 'npm'
-    - run: npm ci
-    - run: npm run build --if-present
-    - run: npm test
+        token: ${{ secrets.VERCEL_TOKEN }}
+        envVariableKeys: FRONT_END_URL,JWT_KEY,MONGO_URL,SENDINBLUE_API_KEY,SENDER_EMAIL,GOOGLE_CLIENT_ID,GOOGLE_SECRET,CLOUDINARY_CLOUD_NAME,CLOUDINARY_API_KEY,CLOUDINARY_API_SECRET,CLOUDINARY_DEFAULT_FOLDER,CLOUDINARY_PRESET,APP_NAME
+      env:
+          FRONT_END_URL: http://localhost:3000
+          JWT_KEY: ${{ secrets.JWT_KEY }}
+          MONGO_URL: ${{ secrets.MONGO_URL }}
+          SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
+          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_SECRET: ${{ secrets.GOOGLE_SECRET }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          CLOUDINARY_DEFAULT_FOLDER: ${{ secrets.CLOUDINARY_DEFAULT_FOLDER }}
+          CLOUDINARY_PRESET: ${{ secrets.CLOUDINARY_PRESET }}
+          APP_NAME: Rello
+     # deploy app to vercel
+    - name: deploy site to vercel
+      uses: amondnet/vercel-action@v20
+      with:
+        vercel-token: ${{ secrets.VERCEL_ORG_ID }} # Required
+        vercel-org-id: ${{ secrets.ORG_ID}} #Required
+        vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
+        vercel-args: "--prod"
+        envVariableKeys: ""
