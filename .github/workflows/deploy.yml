@@ -31,17 +31,41 @@ jobs:
           TARGET_FRONT_END_URL: production
           TYPE_FRONT_END_URL: plain
           JWT_KEY: ${{ secrets.JWT_KEY }}
+          TARGET_JWT_KEY: production
+          TYPE_JWT_KEY: plain
           MONGO_URL: ${{ secrets.MONGO_URL }}
+          TARGET_MONGO_URL: production
+          TYPE_MONGO_URL: plain
           SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
+          TARGET_SENDINBLUE_API_KEY: production
+          TYPE_SENDINBLUE_API_KEY: plain
           SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          TARGET_SENDER_EMAIL: production
+          TYPE_SENDER_EMAIL: plain
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          TARGET_GOOGLE_CLIENT_ID: production
+          TYPE_GOOGLE_CLIENT_ID: plain
           GOOGLE_SECRET: ${{ secrets.GOOGLE_SECRET }}
+          TARGET_GOOGLE_SECRET: production
+          TYPE_GOOGLE_SECRET: plain
           CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          TARGET_CLOUDINARY_CLOUD_NAME: production
+          TYPE_CLOUDINARY_CLOUD_NAME: plain
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          TARGET_CLOUDINARY_API_KEY: production
+          TYPE_CLOUDINARY_API_KEY: plain
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          TARGET_ CLOUDINARY_API_SECRET: production
+          TYPE_ CLOUDINARY_API_SECRET: plain
           CLOUDINARY_DEFAULT_FOLDER: ${{ secrets.CLOUDINARY_DEFAULT_FOLDER }}
+          TARGET_CLOUDINARY_DEFAULT_FOLDER: production
+          TYPE_CLOUDINARY_DEFAULT_FOLDER: plain
           CLOUDINARY_PRESET: ${{ secrets.CLOUDINARY_PRESET }}
+          TARGET_CLOUDINARY_PRESET: production
+          TYPE_CLOUDINARY_PRESET: plain
           APP_NAME: Rello
+          TARGET_APP_NAME: production
+          TYPE_APP_NAME: plain
      # deploy app to vercel
     - name: deploy site to vercel
       uses: amondnet/vercel-action@v20
