@@ -27,7 +27,7 @@ jobs:
         projectName: trello-clone-backend
         envVariableKeys: FRONT_END_URL,JWT_KEY,MONGO_URL,SENDINBLUE_API_KEY,SENDER_EMAIL,GOOGLE_CLIENT_ID,GOOGLE_SECRET,CLOUDINARY_CLOUD_NAME,CLOUDINARY_API_KEY,CLOUDINARY_API_SECRET,CLOUDINARY_DEFAULT_FOLDER,CLOUDINARY_PRESET,APP_NAME
       env:
-          TARGET_FRONT_END_URL: http://localhost:3000
+          FRONT_END_URL: http://localhost:3000
           JWT_KEY: ${{ secrets.JWT_KEY }}
           MONGO_URL: ${{ secrets.MONGO_URL }}
           SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
