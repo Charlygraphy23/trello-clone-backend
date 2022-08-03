@@ -5,6 +5,13 @@
     },
     "builds": [
       {
+        "src": "package.json",
+        "use": "vercel-sapper",
+        "config": {
+            "build": true
+        }
+      },
+      {
           "src": "dist/server.js",
           "use": "@vercel/node",
           "config": { "includeFiles": ["dist/**"] }
