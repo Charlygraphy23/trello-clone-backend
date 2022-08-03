@@ -26,6 +26,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(Routes);
 
+
+app.get("/", (req, res) => res.send("Server Runnning"))
+
 connectToDB();
 
 // error handler
