@@ -5,14 +5,15 @@
     },
     "builds": [
       {
-          "src": "server.js",
-          "use": "@vercel/node"
+          "src": "dist/server.js",
+          "use": "@vercel/node",
+          "config": { "includeFiles": ["dist/**"] }
       }
   ],
   "routes": [
     {
       "src": "/(.*)",
-      "dest": "/server.js"
+      "dest": "dist/server.js"
     }
   ]
  
