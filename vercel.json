@@ -6,7 +6,7 @@
     "builds": [
      
       {
-          "src": "dist/server.js",
+          "src": "dist",
           "use": "@vercel/node"
       }
   ],
