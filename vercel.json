@@ -3,7 +3,13 @@
       "enabled": false,
       "silent": true
     },
-    
+    "builds": [
+     
+      {
+          "src": "dist/server.js",
+          "use": "@vercel/node",
+      }
+  ],
   "routes": [
     {
       "src": "/(.*)",
