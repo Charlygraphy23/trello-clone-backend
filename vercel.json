@@ -1,14 +1,14 @@
 {
-    "github": {
-      "enabled": false,
-      "silent": true
-    },
-    "builds": [
-     
-      {
-          "src": "/",
-          "use": "@vercel/node"
-      }
+  "version": 2,
+  "github": {
+    "enabled": false,
+    "silent": true
+  },
+  "builds": [
+    {
+      "src": "/",
+      "use": "@vercel/node"
+    }
   ],
   "routes": [
     {
@@ -16,5 +16,4 @@
       "dest": "dist/server.js"
     }
   ]
- 
-  }
+}
