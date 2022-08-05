@@ -8,19 +8,10 @@ import Routes from './routers/index';
 const app = express();
 const { server } = initializeSocket(app)
 
-const whitelist = [
-    "http://localhost:3000", "http://192.168.31.221:3000"
-]
+
 // middleware
 app.use(cors({
-    credentials: true,
-    origin: function (origin, callback) {
-        if (origin && whitelist.indexOf(origin) !== -1) {
-            callback(null, true)
-        } else {
-            callback(new Error('Not allowed by CORS'))
-        }
-    }
+    credentials: true
 }));
 app.use(express.json());
 app.use(cookieParser());

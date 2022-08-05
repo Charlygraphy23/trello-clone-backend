@@ -124,8 +124,8 @@ export const convertObjectId = (id: string): mongoose.Types.ObjectId => {
 
 export const COOKIE_OPTIONS: express.CookieOptions = {
   httpOnly: true,
-  // sameSite: "none",
-  // secure: true
+  sameSite: "none",
+  secure: true
 }
 
 export enum MEMBER_ROLES {
