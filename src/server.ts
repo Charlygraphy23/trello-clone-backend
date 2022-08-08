@@ -8,10 +8,19 @@ import Routes from './routers/index';
 const app = express();
 const { server } = initializeSocket(app)
 
-
+const whitelist = [
+    "'https://trello-clone-76971.web.app", "https://rello-backend.herokuapp.com"
+]
 // middleware
 app.use(cors({
-    credentials: true
+    credentials: true,
+    origin: function (origin, callback) {
+        if (origin && whitelist.indexOf(origin) !== -1) {
+            callback(null, true)
+        } else {
+            callback(new Error('Not allowed by CORS'))
+        }
+    }
 }));
 app.use(express.json());
 app.use(cookieParser());
