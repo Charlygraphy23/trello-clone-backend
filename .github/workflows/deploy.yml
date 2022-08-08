@@ -27,7 +27,7 @@ jobs:
         heroku_app_name: "rello-backend" #Must be unique in Heroku
         heroku_email: "dipta.biswas231998@gmail.com"
       env:
-          FRONT_END_URL: http://localhost:3000
+          FRONT_END_URL: https://trello-clone-76971.web.app/
           JWT_KEY: ${{ secrets.JWT_KEY }}
           MONGO_URL: ${{ secrets.MONGO_URL }}
           SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
