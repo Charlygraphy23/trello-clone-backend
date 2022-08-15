@@ -10,9 +10,9 @@ const { server } = initializeSocket(app)
 
 
 // middleware
-// @ts-expect-error
-app.options('*', cors({
-    credentials: true
+app.use(cors({
+    credentials: true,
+    origin: "*"
 }))
 
 app.use(express.json());
