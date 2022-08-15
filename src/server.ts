@@ -10,9 +10,11 @@ const { server } = initializeSocket(app)
 
 
 // middleware
-app.use(cors({
+// @ts-expect-error
+app.options('*', cors({
     credentials: true
-}));
+}))
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(Routes);
