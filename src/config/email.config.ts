@@ -16,7 +16,7 @@ export type MAILParamsType = {
 const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
 apiInstance.setApiKey(
   SibApiV3Sdk.TransactionalEmailsApiApiKeys.apiKey,
-  process.env.SENDINBLUE_API_KEY
+  process.env.HD_SENDINBLUE_API_KEY
 );
 
 export const sendEmail = async (params: MAILParamsType) => {

@@ -19,29 +19,24 @@ jobs:
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
-    - uses: actions/checkout@v3
-    - run: |
-          touch .env
-          echo MONGO_URL=${{ secrets.MONGO_URL }} >> .env
-          cat .env
+    - uses: actions/checkout@v2
     - name: Set Env Vars on Heroku Project
       uses: akhileshns/heroku-deploy@v3.12.12
       with:
         heroku_api_key: ${{secrets.HEROKU_API_KEY}}
         heroku_app_name: "rello-backend" #Must be unique in Heroku
         heroku_email: "dipta.biswas231998@gmail.com"
-        env_file: ".env"
       env:
-          FRONT_END_URL: https://trello-clone-76971.web.app/
-          JWT_KEY: ${{ secrets.JWT_KEY }}
-          MONGO_URL: asdasdasdasd
-          SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
-          SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_SECRET: ${{ secrets.GOOGLE_SECRET }}
-          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
-          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
-          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
-          CLOUDINARY_DEFAULT_FOLDER: ${{ secrets.CLOUDINARY_DEFAULT_FOLDER }}
-          CLOUDINARY_PRESET: ${{ secrets.CLOUDINARY_PRESET }}
-          APP_NAME: Rello
+          HD_FRONT_END_URL: https://trello-clone-76971.web.app/
+          HD_JWT_KEY: ${{ secrets.JWT_KEY }}
+          HD_MONGO_URL: ${{ secrets.MONGO_URL }}
+          HD_SENDINBLUE_API_KEY: ${{ secrets.SENDINBLUE_API_KEY }}
+          HD_SENDER_EMAIL: ${{ secrets.SENDER_EMAIL }}
+          HD_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          HD_GOOGLE_SECRET: ${{ secrets.GOOGLE_SECRET }}
+          HD_CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          HD_CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          HD_CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          HD_CLOUDINARY_DEFAULT_FOLDER: ${{ secrets.CLOUDINARY_DEFAULT_FOLDER }}
+          HD_CLOUDINARY_PRESET: ${{ secrets.CLOUDINARY_PRESET }}
+          HD_APP_NAME: Rello

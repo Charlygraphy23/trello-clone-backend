@@ -44,8 +44,8 @@ export const GenerateLinkWithEmailController = async (
       subject: 'Signup Email',
       body: emailTemplate.toString(),
       sender: {
-        name: process.env.APP_NAME,
-        email: process.env.SENDER_EMAIL.toLowerCase(),
+        name: process.env.HD_APP_NAME,
+        email: process.env.HD_SENDER_EMAIL.toLowerCase(),
       },
       to: {
         email: email.toLowerCase(),
@@ -320,8 +320,8 @@ export const otpGenerateController = async (req: express.Request, res: express.R
       subject: 'Forgot Password Otp',
       body: "",
       sender: {
-        name: process.env.APP_NAME,
-        email: process.env.SENDER_EMAIL.toLowerCase(),
+        name: process.env.HD_APP_NAME,
+        email: process.env.HD_SENDER_EMAIL.toLowerCase(),
       },
       to: {
         email: email.toLowerCase(),

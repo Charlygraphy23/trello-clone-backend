@@ -105,8 +105,8 @@ export const inviteFriends = async (req: express.Request, res: express.Response,
           
           `,
             sender: {
-                name: process.env.APP_NAME,
-                email: process.env.SENDER_EMAIL.toLowerCase(),
+                name: process.env.HD_APP_NAME,
+                email: process.env.HD_SENDER_EMAIL.toLowerCase(),
             },
             to: {
                 email: email.toLowerCase(),
