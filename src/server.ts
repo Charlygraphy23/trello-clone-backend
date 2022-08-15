@@ -24,6 +24,10 @@ app.get("/", (req, res) => res.send("Server Runnning"))
 
 connectToDB();
 
+console.log("MM ", process.env.MONGO_URL)
+console.log("FRONT ", process.env.FRONT_END_URL)
+console.log("CLOUDINARY", process.env.CLOUDINARY_CLOUD_NAME)
+
 // error handler
 app.use(errorHandler);
 
