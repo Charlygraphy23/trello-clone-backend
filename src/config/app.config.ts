@@ -7,13 +7,13 @@ import mongoose from 'mongoose';
 declare global {
   namespace NodeJS {
     interface ProcessEnv {
-      HD_FRONT_END_URL: string;
-      HD_JWT_KEY: string;
-      HD_MONGO_URL: string;
-      HD_SENDINBLUE_API_KEY: string;
-      HD_SENDER_EMAIL: string;
-      HD_APP_NAME: string;
-      HD_GOOGLE_CLIENT_ID: string
+      FRONT_END_URL: string;
+      JWT_KEY: string;
+      MONGO_URL: string;
+      SENDINBLUE_API_KEY: string;
+      SENDER_EMAIL: string;
+      APP_NAME: string;
+      GOOGLE_CLIENT_ID: string
       HD_HOST: number
     }
   }
@@ -112,7 +112,7 @@ export enum LoginType {
 
 export const connectToDB = async () => {
   mongoose
-    .connect(process.env.HD_MONGO_URL)
+    .connect(process.env.MONGO_URL)
     .then(() => console.log('Connected to database'))
     .catch((err) => console.error(err));
 };

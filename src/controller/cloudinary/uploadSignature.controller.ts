@@ -19,8 +19,8 @@ export const getCloudinarySignature = async (req: express.Request, res: express.
         const signature = v2.utils.api_sign_request({
             timestamp: timestamp,
             transformation: 'q_auto:good',
-            folder: folder ?? process.env.HD_CLOUDINARY_DEFAULT_FOLDER,
-            upload_preset: process.env.HD_CLOUDINARY_PRESET
+            folder: folder ?? process.env.CLOUDINARY_DEFAULT_FOLDER,
+            upload_preset: process.env.CLOUDINARY_PRESET
         }, apiSecret);
 
         return SuccessResponse.send({ res, message: "Ok", data: { timestamp, signature } })

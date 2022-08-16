@@ -8,7 +8,7 @@ import { InviteModel, InviteModelType } from '../models/user/invite.model';
 import { OtpModel } from '../models/user/otp';
 
 const saltRounds = 10;
-const googleClient = new OAuth2Client(process.env.HD_GOOGLE_CLIENT_ID, process.env.HD_GOOGLE_SECRET, "postmessage");
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID, process.env.GOOGLE_SECRET, "postmessage");
 export type GenerateJwtTokenType = {
   data: any;
   expires?: string;
@@ -49,7 +49,7 @@ export const generateJwtToken = ({ data, expires }: GenerateJwtTokenType) => {
 
   const options = expires ? { expiresIn: expires } : {}
 
-  return jwt.sign(data, process.env.HD_JWT_KEY, options);
+  return jwt.sign(data, process.env.JWT_KEY, options);
 };
 
 export const generateSignUpEmail = (email: string = '') => {
@@ -63,7 +63,7 @@ export const generateSignUpEmail = (email: string = '') => {
 };
 
 export const jwtVerify = (token: string) => {
-  return jwt.verify(token, process.env.HD_JWT_KEY);
+  return jwt.verify(token, process.env.JWT_KEY);
 }
 
 export const validateJWTTokenForSignUp = (token: string): { email: string } => {
@@ -84,7 +84,7 @@ export const googleAuthInfo = async (token: string) => {
 
   const ticket = await googleClient.verifyIdToken({
     idToken: token,
-    audience: process.env.HD_GOOGLE_CLIENT_ID
+    audience: process.env.GOOGLE_CLIENT_ID
   })
 
   const payload = ticket.getPayload();
