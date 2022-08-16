@@ -12,7 +12,7 @@ const { server } = initializeSocket(app)
 // middleware
 app.use(cors({
     credentials: true,
-    origin: "*"
+    origin: ["https://rello-backend.herokuapp.com", "https://trello-clone-76971.web.app"]
 }))
 
 app.use(express.json());
