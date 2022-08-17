@@ -16,7 +16,8 @@ Open [http://localhost:3300](http://localhost:3300) with your browser to see the
 You can start editing the page by modifying `server.ts`.
  This project has been written in MVC patter, this is how the folder structure is - 
 
-```src-\
+```
+src-\
      config - (All app config files)
      contoller - (All route Controller)
      helper - (All helper function for controller)
@@ -25,15 +26,6 @@ You can start editing the page by modifying `server.ts`.
      routes - (All Routers)
      validator - (All validator for all routes)
 ```
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
 ## Stack
 
