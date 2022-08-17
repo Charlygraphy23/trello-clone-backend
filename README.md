@@ -35,6 +35,8 @@ src-\
 - Sendinblue Email
 - Google Auth
 - Cloudinary
+- Socket Io
+- JWT
 - Delpoyed To heroku
 - Git Action CI/CD
 
