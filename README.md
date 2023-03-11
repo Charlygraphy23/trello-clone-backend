@@ -8,7 +8,7 @@ First, run the development server:
 npm i
 npm run dev:start
 # or
-yarn dev:start
+yarn dev:start 
 ```
 
 Open [http://localhost:3300](http://localhost:3300) with your browser to see the result.
