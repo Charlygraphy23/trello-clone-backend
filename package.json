@@ -7,7 +7,7 @@
     "clean": "rimraf dist",
     "dev:start": "nodemon src/server.ts  ",
     "build": "npm run clean && tsc -p ./",
-    "start": "node dist/server.js"
+    "start": "npm run build && node dist/server.js"
   },
   "author": "Dipta Biswas",
   "license": "ISC",
