@@ -42,4 +42,6 @@ src-\
 
 ## Demo -
 
-here is the Link of backend running on heroku server - [Link](https://trello-clone-a6v7.onrender.com)
+here is the Link of backend running on render server - [Link](https://trello-clone-a6v7.onrender.com) 
+
+***Note it will take more than 30 sec to connect to server since i'm using onrender free tire. [onrender](https://render.com/docs/free#free-web-services)
